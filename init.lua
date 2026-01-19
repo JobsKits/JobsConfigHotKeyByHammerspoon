@@ -7,6 +7,10 @@ end
 
 local function launch(appName)
   hs.application.launchOrFocus(appName)
+  if not ok then
+    -- 兜底：用 open -a 启动（对 LarkSuite 这类最稳）
+    hs.execute('open -a "' .. appName .. '"')
+  end
 end
 
 local function openPath(path)
@@ -20,9 +24,9 @@ hs.hotkey.bind({"cmd"}, "1", function()
   notify("SourceTree")
 end)
 
--- ⌘2 备忘录
+-- ⌘2 备忘录（用 Bundle ID 最稳）
 hs.hotkey.bind({"cmd"}, "2", function()
-  launch("备忘录") -- macOS 中文名通常可用；若不行改成 "Notes"
+  hs.application.launchOrFocusByBundleID("com.apple.Notes")
   notify("备忘录")
 end)
 
@@ -32,10 +36,27 @@ hs.hotkey.bind({"cmd"}, "3", function()
   notify("Telegram")
 end)
 
+-- ⌘4 LarkSuite（绝对路径 + 已运行则切前台）
+hs.hotkey.bind({"cmd"}, "4", function()
+  local app = hs.application.get("LarkSuite")
+  if app then
+    app:activate()
+  else
+    hs.execute('open "/Applications/LarkSuite.app"')
+  end
+  notify("LarkSuite")
+end)
+
 -- ⌘I Google Chrome
 hs.hotkey.bind({"cmd"}, "i", function()
   launch("Google Chrome")
   notify("Google Chrome")
+end)
+
+-- ⌘Y 网易有道翻译（有道词典）
+hs.hotkey.bind({"cmd"}, "y", function()
+  launch("网易有道翻译")
+  notify("网易有道翻译")
 end)
 
 -- ⌘D 打开下载文件夹

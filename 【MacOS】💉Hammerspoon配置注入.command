@@ -141,10 +141,27 @@ install_brew_if_missing() {
   success_echo "Homebrew 安装完成：$(command -v brew)"
 }
 
-# ================================== Homebrew：自检（存在则升级） ==================================
-# 说明：存在 brew 的基础上执行 update/upgrade（符合“自检=存在则升级，没有则安装最新”）
-self_check_brew() {
+# ================================== Homebrew：可选自检（回车跳过；输入任意字符才执行） ==================================
+# 说明：
+# - 无论是否跳过，都必须保证 brew 可用（否则后续无法安装 cask）
+# - 直接回车：仅确保 brew 已安装并可用，不做 update/upgrade
+# - 输入任意字符再回车：执行 brew update/upgrade
+self_check_brew_optional() {
   install_brew_if_missing
+
+  print -r -- ""
+  note_echo "Homebrew 自检选项"
+  gray_echo "直接按【回车】=> 跳过 brew update/upgrade（更快）"
+  gray_echo "输入任意字符后按【回车】=> 执行 brew update/upgrade（更稳但更慢）"
+  print -r -- ""
+
+  local input
+  IFS= read -r input
+
+  if [[ -z "${input}" ]]; then
+    warn_echo "已选择跳过 Homebrew 自检（update/upgrade）。"
+    return 0
+  fi
 
   info_echo "执行 brew update…"
   brew update
@@ -228,7 +245,7 @@ main() {
   print_intro
   wait_for_enter "确认：我已了解脚本用途，继续执行？"
 
-  self_check_brew
+  self_check_brew_optional
   install_hammerspoon
   prepare_hammerspoon_init
   post_steps
