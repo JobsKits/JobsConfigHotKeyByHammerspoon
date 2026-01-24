@@ -59,6 +59,12 @@ hs.hotkey.bind({"cmd"}, "y", function()
   notify("网易有道翻译")
 end)
 
+-- ⌘⇧F Figma
+hs.hotkey.bind({ "cmd", "shift" }, "f", function()
+  launch("Figma")
+  notify("Figma")
+end)
+
 -- ⌘D 打开下载文件夹
 hs.hotkey.bind({"cmd"}, "d", function()
   openPath(os.getenv("HOME") .. "/Downloads")
