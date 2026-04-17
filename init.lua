@@ -6,9 +6,10 @@ local function notify(msg)
 end
 
 local function launch(appName)
-  hs.application.launchOrFocus(appName)
-  if not ok then
-    -- 兜底：用 open -a 启动（对 LarkSuite 这类最稳）
+  local app = hs.application.get(appName)
+  if app then
+    app:activate()
+  else
     hs.execute('open -a "' .. appName .. '"')
   end
 end
@@ -60,7 +61,7 @@ hs.hotkey.bind({"cmd"}, "y", function()
 end)
 
 -- ⌘⇧F Figma
-hs.hotkey.bind({ "cmd", "shift" }, "f", function()
+hs.hotkey.bind({"cmd", "shift"}, "f", function()
   launch("Figma")
   notify("Figma")
 end)
@@ -71,16 +72,27 @@ hs.hotkey.bind({"cmd"}, "d", function()
   notify("Downloads")
 end)
 
--- ⌘T 打开终端（默认 Terminal；要 iTerm 改这里）
+-- ⌘T 打开 Terminal，并总是新建一个窗口
 hs.hotkey.bind({"cmd"}, "t", function()
-  launch("Terminal") -- 改成 "iTerm" / "Warp" / "iTerm2" 视你安装名
-  notify("Terminal")
+  local ok, _, err = hs.osascript.applescript([[
+    tell application "Terminal"
+      activate
+      do script ""
+    end tell
+  ]])
+
+  if ok then
+    notify("Terminal")
+  else
+    notify("Terminal 打开失败")
+    print("Terminal AppleScript error: " .. tostring(err))
+  end
 end)
 
 -- ================================== 热重载（可选但强烈建议） ==================================
 -- ⌘⌥⌃R 重新加载配置
-hs.hotkey.bind({"cmd","alt","ctrl"}, "r", function()
+hs.hotkey.bind({"cmd", "alt", "ctrl"}, "r", function()
   hs.reload()
 end)
-notify("Hammerspoon 配置已加载 ✅")
 
+notify("Hammerspoon 配置已加载 ✅")
