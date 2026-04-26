@@ -62,10 +62,29 @@ hs.hotkey.bind({"cmd"}, "i", function()
   notify("Google Chrome")
 end)
 
--- ⌘Y 网易有道翻译（有道词典）
+-- ⌘Y 网易有道翻译（有道词典）：已打开则显示到桌面，未打开则启动
 hs.hotkey.bind({"cmd"}, "y", function()
-  launch("网易有道翻译")
-  notify("网易有道翻译")
+  local bundleID = "com.youdao.YoudaoDict"
+
+  local app = hs.application.get(bundleID)
+  if app then
+    app:unhide()
+    app:activate(true)
+
+    for _, win in ipairs(app:allWindows()) do
+      win:unminimize()
+      win:raise()
+    end
+
+    local win = app:mainWindow()
+    if win then
+      win:focus()
+    end
+  else
+    hs.application.launchOrFocusByBundleID(bundleID)
+  end
+
+  notify("有道词典")
 end)
 
 -- ⌘⇧F Figma
