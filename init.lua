@@ -7,8 +7,16 @@ end
 
 local function launch(appName)
   local app = hs.application.get(appName)
+
   if app then
-    app:activate()
+    app:unhide()
+    app:activate(true)
+
+    local win = app:mainWindow()
+    if win then
+      win:unminimize()
+      win:focus()
+    end
   else
     hs.execute('open -a "' .. appName .. '"')
   end
@@ -21,7 +29,7 @@ end
 -- ================================== 快捷键：应用启动/切换 ==================================
 -- ⌘1 SourceTree
 hs.hotkey.bind({"cmd"}, "1", function()
-  launch("SourceTree")
+  hs.application.launchOrFocusByBundleID("com.torusknot.SourceTreeNotMAS")
   notify("SourceTree")
 end)
 
