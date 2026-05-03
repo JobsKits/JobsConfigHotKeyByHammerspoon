@@ -26,6 +26,70 @@ local function openPath(path)
   hs.execute('open "' .. path .. '"')
 end
 
+-- ================================== 输入法：终端自动切英文 ==================================
+-- 系统英文输入源通常是 ABC 或 U.S.，这里两个都兼容。
+local englishInputSources = {
+  "com.apple.keylayout.ABC",
+  "com.apple.keylayout.US",
+}
+
+local terminalBundleID = "com.apple.Terminal"
+
+local terminalApps = {
+  ["Terminal"] = true,
+  ["终端"] = true,
+}
+
+local function isTerminalApplication(appObject, appName)
+  if appObject and appObject:bundleID() == terminalBundleID then
+    return true
+  end
+
+  return appName and terminalApps[appName] == true
+end
+
+local function switchToEnglishInputSource()
+  local currentSourceID = hs.keycodes.currentSourceID()
+
+  for _, sourceID in ipairs(englishInputSources) do
+    if currentSourceID == sourceID then
+      return true
+    end
+  end
+
+  for _, sourceID in ipairs(englishInputSources) do
+    hs.keycodes.currentSourceID(sourceID)
+
+    if hs.keycodes.currentSourceID() == sourceID then
+      return true
+    end
+  end
+
+  return false
+end
+
+local function switchToEnglishInputSourceWithRetry()
+  -- Terminal 新窗口创建后，macOS 可能会稍后恢复上一次中文输入法。
+  -- 连续切几次，覆盖 Terminal / 系统恢复输入法的时机。
+  hs.timer.doAfter(0.05, switchToEnglishInputSource)
+  hs.timer.doAfter(0.25, switchToEnglishInputSource)
+  hs.timer.doAfter(0.60, switchToEnglishInputSource)
+end
+
+local function terminalInputSourceWatcher(appName, eventType, appObject)
+  if not isTerminalApplication(appObject, appName) then
+    return
+  end
+
+  if eventType == hs.application.watcher.launched
+      or eventType == hs.application.watcher.activated then
+    switchToEnglishInputSourceWithRetry()
+  end
+end
+
+terminalInputWatcher = hs.application.watcher.new(terminalInputSourceWatcher)
+terminalInputWatcher:start()
+
 -- ================================== 快捷键：应用启动/切换 ==================================
 -- ⌘1 SourceTree
 hs.hotkey.bind({"cmd"}, "1", function()
@@ -99,16 +163,19 @@ hs.hotkey.bind({"cmd"}, "d", function()
   notify("Downloads")
 end)
 
--- ⌘T 打开 Terminal，并总是新建一个窗口
+-- ⌘T 打开 Terminal，并且只新建一个终端窗口
 hs.hotkey.bind({"cmd"}, "t", function()
+  -- 不要先 activate 再 do script。
+  -- Terminal 在没有窗口时，activate 会自己开一个默认窗口；随后 do script 又会再开一个，结果就是两个窗口。
   local ok, _, err = hs.osascript.applescript([[
     tell application "Terminal"
-      activate
       do script ""
+      activate
     end tell
   ]])
 
   if ok then
+    switchToEnglishInputSourceWithRetry()
     notify("Terminal")
   else
     notify("Terminal 打开失败")
