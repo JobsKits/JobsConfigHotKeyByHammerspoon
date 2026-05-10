@@ -120,6 +120,12 @@ hs.hotkey.bind({"cmd"}, "4", function()
   notify("LarkSuite")
 end)
 
+-- ⌘5 Codex
+hs.hotkey.bind({"cmd"}, "5", function()
+  launch("Codex")
+  notify("Codex")
+end)
+
 -- ⌘I Google Chrome
 hs.hotkey.bind({"cmd"}, "i", function()
   launch("Google Chrome")
@@ -163,10 +169,18 @@ hs.hotkey.bind({"cmd"}, "d", function()
   notify("Downloads")
 end)
 
--- ⌘T 打开 Terminal，并且只新建一个终端窗口
+-- ⌘T：Terminal 未运行时只打开一个窗口；已运行时新建一个终端窗口
 hs.hotkey.bind({"cmd"}, "t", function()
-  -- 不要先 activate 再 do script。
-  -- Terminal 在没有窗口时，activate 会自己开一个默认窗口；随后 do script 又会再开一个，结果就是两个窗口。
+  local app = hs.application.get(terminalBundleID)
+
+  if not app then
+    -- Terminal 未运行时不要用 do script，否则可能和启动默认窗口叠加，打开两个窗口。
+    hs.execute('open -a "Terminal"')
+    switchToEnglishInputSourceWithRetry()
+    notify("Terminal")
+    return
+  end
+
   local ok, _, err = hs.osascript.applescript([[
     tell application "Terminal"
       do script ""

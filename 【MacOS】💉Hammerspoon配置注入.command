@@ -86,7 +86,7 @@ print_intro() {
   print -r -- "------------------------------------------------------------"
   print -r -- "将执行以下操作："
   print -r -- "1) 自检 Homebrew：存在则 brew update/upgrade；不存在则安装最新版"
-  print -r -- "2) brew install --cask hammerspoon"
+  print -r -- "2) 检查 Hammerspoon：已安装则跳过；Homebrew cask 已安装则可选择升级；未安装才安装"
   print -r -- "3) 配置 ${HS_INIT_LUA}"
   print -r -- "   - 若已存在：备份为 init.lua.bak.<timestamp>"
   print -r -- "   - 若不存在：创建目录并新建文件"
@@ -173,20 +173,54 @@ self_check_brew_optional() {
 }
 
 # ================================== 安装 Hammerspoon（cask） ==================================
-# 说明：已安装则尝试升级；未安装则安装
+# 说明：已安装则默认跳过；输入任意字符才尝试升级；未安装才安装
+is_hammerspoon_app_installed() {
+  if [[ -d "/Applications/Hammerspoon.app" || -d "${HOME}/Applications/Hammerspoon.app" ]]; then
+    return 0
+  fi
+
+  if command -v mdfind >/dev/null 2>&1; then
+    mdfind 'kMDItemCFBundleIdentifier == "org.hammerspoon.Hammerspoon"' | grep -q '/Hammerspoon.app$' && return 0
+  fi
+
+  return 1
+}
+
 install_hammerspoon() {
-  info_echo "准备安装 Hammerspoon（brew cask）…"
-  wait_for_enter "确认：开始安装/升级 Hammerspoon？"
+  info_echo "检查 Hammerspoon 安装状态…"
 
   if brew list --cask hammerspoon >/dev/null 2>&1; then
-    info_echo "已检测到 Hammerspoon cask，尝试升级…"
+    success_echo "已检测到 Hammerspoon cask。"
+    print -r -- ""
+    note_echo "Hammerspoon 升级选项"
+    gray_echo "直接按【回车】=> 跳过 Hammerspoon 升级"
+    gray_echo "输入任意字符后按【回车】=> 执行 brew upgrade --cask hammerspoon"
+    print -r -- ""
+
+    local input
+    IFS= read -r input
+
+    if [[ -z "${input}" ]]; then
+      warn_echo "已选择跳过 Hammerspoon 升级。"
+      return 0
+    fi
+
+    info_echo "执行 brew upgrade --cask hammerspoon…"
     brew upgrade --cask hammerspoon || true
     success_echo "Hammerspoon 升级流程已执行。"
-  else
-    info_echo "未检测到 Hammerspoon cask，开始安装…"
-    brew install --cask hammerspoon
-    success_echo "Hammerspoon 安装完成。"
+    return 0
   fi
+
+  if is_hammerspoon_app_installed; then
+    success_echo "已检测到本机已安装 Hammerspoon.app。"
+    warn_echo "该安装未登记在 Homebrew cask 中，跳过 brew install/upgrade，避免重复安装。"
+    return 0
+  fi
+
+  info_echo "未检测到 Hammerspoon，开始安装…"
+  wait_for_enter "确认：开始安装 Hammerspoon？"
+  brew install --cask hammerspoon
+  success_echo "Hammerspoon 安装完成。"
 }
 
 # ================================== Hammerspoon 配置：检查 init.lua（备份/新建/写入） ==================================
@@ -226,14 +260,52 @@ prepare_hammerspoon_init() {
   success_echo "init.lua 已更新完成。"
 }
 
+
+# ================================== Hammerspoon 配置：自动 Reload ==================================
+# 说明：
+# - init.lua 写入完成后自动让 Hammerspoon 重新加载配置
+# - 如果 Hammerspoon 正在运行：执行 hs.reload()
+# - 如果 Hammerspoon 未运行：启动 Hammerspoon，启动时会自动加载 ~/.hammerspoon/init.lua
+reload_hammerspoon_config() {
+  info_echo "准备自动 Reload Hammerspoon 配置…"
+
+  if pgrep -x "Hammerspoon" >/dev/null 2>&1; then
+    if command -v osascript >/dev/null 2>&1; then
+      osascript <<'APPLESCRIPT' >/dev/null 2>&1
+      tell application "Hammerspoon"
+        execute lua code "hs.reload()"
+      end tell
+APPLESCRIPT
+      success_echo "Hammerspoon 已自动 Reload 配置。"
+      return 0
+    fi
+
+    warn_echo "未找到 osascript，无法自动 Reload。请手动点击菜单栏锤子图标 -> Reload Config。"
+    return 0
+  fi
+
+  warn_echo "Hammerspoon 当前未运行，将启动 Hammerspoon。"
+
+  if open -b "org.hammerspoon.Hammerspoon" >/dev/null 2>&1; then
+    success_echo "Hammerspoon 已启动，并会加载最新 init.lua。"
+    return 0
+  fi
+
+  if open -a "Hammerspoon" >/dev/null 2>&1; then
+    success_echo "Hammerspoon 已启动，并会加载最新 init.lua。"
+    return 0
+  fi
+
+  warn_echo "未能自动启动 Hammerspoon。请手动打开 Applications -> Hammerspoon。"
+}
+
 # ================================== 提示：如何生效 ==================================
 post_steps() {
   print -r -- ""
   success_echo "全部完成 ✅"
-  note_echo "下一步（手动）："
-  gray_echo "1) 打开 Applications -> Hammerspoon（或用 Spotlight 搜索）"
-  gray_echo "2) 菜单栏锤子图标 -> Reload Config"
-  gray_echo "3) 首次使用请在 系统设置 -> 隐私与安全性 -> 辅助功能 中允许 Hammerspoon"
+  note_echo "提示："
+  gray_echo "1) init.lua 已写入，脚本已尝试自动 Reload Hammerspoon"
+  gray_echo "2) 首次使用请在 系统设置 -> 隐私与安全性 -> 辅助功能 中允许 Hammerspoon"
   print -r -- ""
 }
 
@@ -248,6 +320,7 @@ main() {
   self_check_brew_optional
   install_hammerspoon
   prepare_hammerspoon_init
+  reload_hammerspoon_config
   post_steps
 }
 
