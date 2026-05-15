@@ -22,6 +22,42 @@ local function launch(appName)
   end
 end
 
+local function launchChromeApp(appName)
+  local app = hs.application.get(appName)
+
+  if app then
+    app:unhide()
+    app:activate(true)
+
+    local win = app:mainWindow()
+    if win then
+      win:unminimize()
+      win:focus()
+    end
+
+    return
+  end
+
+  local home = os.getenv("HOME")
+  local appPaths = {
+    home .. "/Applications/Chrome Apps.localized/" .. appName .. ".app",
+    home .. "/Applications/Chrome Apps/" .. appName .. ".app",
+    home .. "/Applications/Chrome 应用/" .. appName .. ".app",
+    "/Applications/Chrome Apps.localized/" .. appName .. ".app",
+    "/Applications/Chrome Apps/" .. appName .. ".app",
+    "/Applications/Chrome 应用/" .. appName .. ".app",
+  }
+
+  for _, appPath in ipairs(appPaths) do
+    if hs.fs.attributes(appPath) then
+      hs.execute('open "' .. appPath .. '"')
+      return
+    end
+  end
+
+  hs.execute('open -a "' .. appName .. '"')
+end
+
 local function openPath(path)
   hs.execute('open "' .. path .. '"')
 end
@@ -103,10 +139,16 @@ hs.hotkey.bind({"cmd"}, "2", function()
   notify("备忘录")
 end)
 
--- ⌘3 Telegram
+-- ⌘3 Telegram（原生客户端，已停用）
+-- hs.hotkey.bind({"cmd"}, "3", function()
+--   launch("Telegram")
+--   notify("Telegram")
+-- end)
+
+-- ⌘3 Telegram Web（Chrome 应用）
 hs.hotkey.bind({"cmd"}, "3", function()
-  launch("Telegram")
-  notify("Telegram")
+  launchChromeApp("Telegram Web")
+  notify("Telegram Web")
 end)
 
 -- ⌘4 LarkSuite（绝对路径 + 已运行则切前台）
