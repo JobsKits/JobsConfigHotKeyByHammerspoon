@@ -62,6 +62,22 @@ local function openPath(path)
   hs.execute('open "' .. path .. '"')
 end
 
+local function openPrivacySecurity()
+  local urls = {
+    "x-apple.systempreferences:com.apple.settings.PrivacySecurity.extension",
+    "x-apple.systempreferences:com.apple.preference.security",
+  }
+
+  for _, url in ipairs(urls) do
+    local _, ok = hs.execute('/usr/bin/open "' .. url .. '"', true)
+    if ok then
+      return
+    end
+  end
+
+  launch("System Settings")
+end
+
 -- ================================== 输入法：终端自动切英文 ==================================
 -- 系统英文输入源通常是 ABC 或 U.S.，这里两个都兼容。
 local englishInputSources = {
@@ -209,6 +225,12 @@ end)
 hs.hotkey.bind({"cmd"}, "d", function()
   openPath(os.getenv("HOME") .. "/Downloads")
   notify("Downloads")
+end)
+
+-- ⌥Z 打开系统设置：隐私与安全
+hs.hotkey.bind({"alt"}, "z", function()
+  openPrivacySecurity()
+  notify("隐私与安全")
 end)
 
 -- ⌘T：Terminal 未运行时只打开一个窗口；已运行时新建一个终端窗口
