@@ -2,9 +2,11 @@
 
 ![Jobs倾情奉献](https://picsum.photos/1500/400 "Jobs出品，必属精品")
 
+[toc]
+
 ## 一、手动安装步骤
 
-* [**Homebrew**](https://brew.sh/) ➤ [**Hammerspoon**](https://www.hammerspoon.org/)
+- [**Homebrew**](https://brew.sh/) ➤ [**Hammerspoon**](https://www.hammerspoon.org/)
   * 安装 [**Homebrew**](https://brew.sh/)
     
     ```shell
@@ -15,8 +17,8 @@
     ```shell
     brew install --cask hammerspoon
     ```
-* 写入替换 ➤ `~/.hammerspoon/init.lua`
-* 配置完成后，需要重启 [**Hammerspoon**](https://www.hammerspoon.org/) 或点击 `Reload Config` 刷新配置后才会生效。
+- 写入替换 ➤ `~/.hammerspoon/init.lua`
+- 配置完成后，需要重启 [**Hammerspoon**](https://www.hammerspoon.org/) 或点击 `Reload Config` 刷新配置后才会生效。
   
   ![image-25690117162712872](./assets/image-25690117162712872.png)
 
@@ -57,7 +59,7 @@ graph TD
 
 ## 四、`⌥ + Z` 隐私与安全快捷键
 
-* `⌥ + Z` 对应 [**Hammerspoon**](https://www.hammerspoon.org/) 里的 `alt + z`，用于快速打开 [**macOS**](https://www.apple.com/macos/)「系统设置」➤「隐私与安全」。
+- `⌥ + Z` 对应 [**Hammerspoon**](https://www.hammerspoon.org/) 里的 `alt + z`，用于快速打开 [**macOS**](https://www.apple.com/macos/)「系统设置」➤「隐私与安全」。
   
   ```lua
   hs.hotkey.bind({"alt"}, "z", function()
@@ -65,4 +67,4 @@ graph TD
     notify("隐私与安全")
   end)
   ```
-* 这个快捷键只负责打开目标页面；像「仍要打开」这类安全确认按钮，仍建议手动点击，别做自动化点击。
+- 这个快捷键只负责打开目标页面；像「仍要打开」这类安全确认按钮，仍建议手动点击，别做自动化点击。
