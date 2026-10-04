@@ -1,10 +1,10 @@
-# [**Hammerspoon**](https://www.hammerspoon.org/) 配置 **macOS** 热键
+# <span id="前言">[**Hammerspoon**](https://www.hammerspoon.org/) 配置 **macOS** 热键</span>
 
 ![Jobs出品，必属精品](https://picsum.photos/1500/400)
 
 [toc]
 
-## 一、手动安装步骤
+## 一、手动安装步骤 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 - [**Homebrew**](https://brew.sh/) ➤ [**Hammerspoon**](https://www.hammerspoon.org/)
   * 安装 [**Homebrew**](https://brew.sh/)
@@ -22,7 +22,7 @@
   
   ![image-25690117162712872](./assets/image-25690117162712872.png)
 
-## 二、脚本安装（流程图）
+## 二、脚本安装（流程图） <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 ```mermaid
 graph TD
@@ -40,7 +40,7 @@ graph TD
     J --> K([结束])
 ```
 
-## 三、快捷键清单
+## 三、快捷键清单 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 | 快捷键 | 功能 |
 | --- | --- |
@@ -57,7 +57,7 @@ graph TD
 | `⌥ + Z` | 打开「系统设置」里的「隐私与安全」 |
 | `⌘ + ⌥ + ⌃ + R` | 重新加载 [**Hammerspoon**](https://www.hammerspoon.org/) 配置 |
 
-## 四、`⌥ + Z` 隐私与安全快捷键
+## 四、`⌥ + Z` 隐私与安全快捷键 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 - `⌥ + Z` 对应 [**Hammerspoon**](https://www.hammerspoon.org/) 里的 `alt + z`，用于快速打开 [**macOS**](https://www.apple.com/macos/)「系统设置」➤「隐私与安全」。
   
@@ -68,3 +68,5 @@ graph TD
   end)
   ```
 - 这个快捷键只负责打开目标页面；像「仍要打开」这类安全确认按钮，仍建议手动点击，别做自动化点击。
+
+<a id="🔚" href="#前言" style="font-size:17px; color:green; font-weight:bold;">我是有底线的➤点我回到首页</a>
