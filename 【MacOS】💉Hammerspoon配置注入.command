@@ -26,6 +26,29 @@
 
 
 # ================================== 全局变量 ==================================
+# 仅渲染自述：标题红色加粗，编号正文蓝色常规字重；非彩色终端输出纯文本。
+jobs_intro_style() {
+  local intro_color=0
+  if [ -t 1 ] && [ -n "${TERM:-}" ] && [ "${TERM:-}" != dumb ] &&
+     [ -z "${NO_COLOR+x}" ] && [ "${PLAIN_OUTPUT:-0}" != 1 ] &&
+     [ "${IS_SOURCETREE_RUNTIME:-0}" != 1 ]; then
+    intro_color=1
+  fi
+  /usr/bin/awk -v color="$intro_color" -v role="${1:-body}" '
+    BEGIN { esc = sprintf("%c", 27) }
+    {
+      gsub(esc "\\[[0-9;]*m", "")
+      gsub(/\\(033|e|x1[bB])\[[0-9;]*m/, "")
+      if (!color || $0 ~ /^[[:space:]]*$/) { print; next }
+      numbered = ($0 ~ /^[[:space:]➤ℹ🔹✔⚠]*([0-9]+[、.)）]|[0-9]+️⃣|[-•])/)
+      heading = ($0 ~ /^[[:space:]]*#{1,6}[[:space:]]/ || $0 ~ /[：:][[:space:]]*$/ || $0 ~ /^[[:space:]]*[=━─-]{3}/)
+      title = (!numbered && (role == "title" || heading))
+      if (role == "auto" && !seen && !numbered) title = 1
+      if ($0 !~ /^[[:space:]]*[=━─-]+[[:space:]]*$/) seen = 1
+      printf "%s%s%s\n", esc (title ? "[1;31m" : "[0;34m"), $0, esc "[0m"
+    }
+  '
+}
 SCRIPT_PATH="${0:A}"
 SCRIPT_DIR="${SCRIPT_PATH:h}"
 SCRIPT_BASENAME="${SCRIPT_PATH:t:r}"
@@ -84,22 +107,22 @@ wait_for_enter() {
 }
 # ================================== 自述 ==================================
 print_intro() {
-  print -r -- ""
-  print -r -- "============================================================"
-  print -r -- "🛠️  Hammerspoon 安装与配置脚本"
-  print -r -- "------------------------------------------------------------"
-  print -r -- "将执行以下操作："
-  print -r -- "1) 自检 Homebrew：存在则 brew update/upgrade；不存在则安装最新版"
-  print -r -- "2) 检查 Hammerspoon：已安装则跳过；Homebrew cask 已安装则可选择升级；未安装才安装"
-  print -r -- "3) 配置 ${HS_INIT_LUA}"
-  print -r -- "   - 若已存在：备份为 init.lua.bak.<timestamp>"
-  print -r -- "   - 若不存在：创建目录并新建文件"
-  print -r -- "   - 内容来源：脚本同级目录 ${LOCAL_INIT_LUA}"
-  print -r -- "------------------------------------------------------------"
-  print -r -- "日志文件：${LOG_FILE}"
-  print -r -- "脚本目录：${SCRIPT_DIR}"
-  print -r -- "============================================================"
-  print -r -- ""
+  print -r -- "" | jobs_intro_style body
+  print -r -- "============================================================" | jobs_intro_style title
+  print -r -- "🛠️  Hammerspoon 安装与配置脚本" | jobs_intro_style body
+  print -r -- "------------------------------------------------------------" | jobs_intro_style body
+  print -r -- "将执行以下操作：" | jobs_intro_style title
+  print -r -- "1) 自检 Homebrew：存在则 brew update/upgrade；不存在则安装最新版" | jobs_intro_style body
+  print -r -- "2) 检查 Hammerspoon：已安装则跳过；Homebrew cask 已安装则可选择升级；未安装才安装" | jobs_intro_style body
+  print -r -- "3) 配置 ${HS_INIT_LUA}" | jobs_intro_style body
+  print -r -- "   - 若已存在：备份为 init.lua.bak.<timestamp>" | jobs_intro_style body
+  print -r -- "   - 若不存在：创建目录并新建文件" | jobs_intro_style body
+  print -r -- "   - 内容来源：脚本同级目录 ${LOCAL_INIT_LUA}" | jobs_intro_style body
+  print -r -- "------------------------------------------------------------" | jobs_intro_style body
+  print -r -- "日志文件：${LOG_FILE}" | jobs_intro_style body
+  print -r -- "脚本目录：${SCRIPT_DIR}" | jobs_intro_style body
+  print -r -- "============================================================" | jobs_intro_style title
+  print -r -- "" | jobs_intro_style body
 }
 # ================================== Homebrew：环境注入 ==================================
 # 说明：为了让当前脚本能直接用 brew（尤其是 Apple Silicon 默认不在 PATH），需要注入 shellenv
@@ -306,12 +329,12 @@ post_steps() {
 }
 # 打印脚本内置自述，并按运行入口决定是否等待用户确认。
 show_script_intro_and_wait() {
-  print -r -- '============================== 脚本内置自述 =============================='
-  print -r -- '脚本名称：【MacOS】💉Hammerspoon配置注入.command'
-  print -r -- '核心用途：执行“💉Hammerspoon配置注入”对应的本机环境配置任务。'
-  print -r -- '影响范围：可能安装、更新或修改当前用户的工具链与配置文件。'
-  print -r -- '取消方式：确认前按 Ctrl+C 终止，不会继续执行后续业务。'
-  print -r -- '============================================================================'
+  print -r -- '============================== 脚本内置自述 ==============================' | jobs_intro_style title
+  print -r -- '脚本名称：【MacOS】💉Hammerspoon配置注入.command' | jobs_intro_style title
+  print -r -- '核心用途：执行“💉Hammerspoon配置注入”对应的本机环境配置任务。' | jobs_intro_style body
+  print -r -- '影响范围：可能安装、更新或修改当前用户的工具链与配置文件。' | jobs_intro_style body
+  print -r -- '取消方式：确认前按 Ctrl+C 终止，不会继续执行后续业务。' | jobs_intro_style body
+  print -r -- '============================================================================' | jobs_intro_style title
   if [[ ! -t 0 ]]; then
     print -u2 -r -- '当前没有可交互输入，请在终端中重新运行。'
     return 1
