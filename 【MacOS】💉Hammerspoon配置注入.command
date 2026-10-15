@@ -236,7 +236,7 @@ SCRIPT_DIR="${SCRIPT_PATH:h}"
 SCRIPT_BASENAME="${SCRIPT_PATH:t:r}"
 LOG_FILE="/tmp/${SCRIPT_BASENAME}.log"
 
-LOCAL_INIT_LUA="${SCRIPT_DIR:h}/init.lua"
+LOCAL_INIT_LUA="${SCRIPT_DIR}/init.lua"
 HS_DIR="${HOME}/.hammerspoon"
 HS_INIT_LUA="${HS_DIR}/init.lua"
 # ================================== 输出与日志（默认无颜色，避免 \033 乱码） ==================================
@@ -412,20 +412,27 @@ install_hammerspoon() {
   brew install --cask hammerspoon
   success_echo "Hammerspoon 安装完成。"
 }
+# 安装依赖前校验同级配置，写入前再检查，避免文件中途被移走。
+check_local_init_lua() {
+  if [[ ! -f "${LOCAL_INIT_LUA}" ]]; then
+    error_echo "未找到脚本同级目录的 init.lua：${LOCAL_INIT_LUA}"
+    error_echo "请把 init.lua 与当前脚本放在同一目录后重试：${SCRIPT_DIR}"
+    return 1
+  fi
+  if [[ ! -r "${LOCAL_INIT_LUA}" ]]; then
+    error_echo "无法读取脚本同级目录的 init.lua：${LOCAL_INIT_LUA}"
+    return 1
+  fi
+}
 # ================================== Hammerspoon 配置：检查 init.lua（备份/新建/写入） ==================================
 # 说明：
 # - 检查脚本同级目录 init.lua 是否存在
 # - ~/.hammerspoon/init.lua 若存在则备份；不存在则创建
 # - 用同级 init.lua 覆盖写入目标
 prepare_hammerspoon_init() {
-  if [[ ! -f "${LOCAL_INIT_LUA}" ]]; then
-    error_echo "未找到脚本同级目录的 init.lua：${LOCAL_INIT_LUA}"
-    error_echo "请把你的 init.lua 放到脚本同目录后重试。"
-    exit 1
-  fi
-
   info_echo "准备配置 Hammerspoon：${HS_INIT_LUA}"
   wait_for_enter "确认：开始写入/替换 ~/.hammerspoon/init.lua？"
+  check_local_init_lua || return 1
 
   if [[ ! -d "${HS_DIR}" ]]; then
     info_echo "创建目录：${HS_DIR}"
@@ -501,6 +508,7 @@ show_script_intro_and_wait() {
   print -r -- '核心用途：执行“💉Hammerspoon配置注入”对应的本机环境配置任务。' | jobs_intro_style body
   print -r -- '影响范围：可能安装、更新或修改当前用户的工具链与配置文件。' | jobs_intro_style body
   print -r -- '取消方式：确认前按 Ctrl+C 终止，不会继续执行后续业务。' | jobs_intro_style body
+  print -r -- "日志文件：${LOG_FILE}" | jobs_intro_style body
   print -r -- '============================================================================' | jobs_intro_style title
   if [[ ! -t 0 ]]; then
     print -u2 -r -- '当前没有可交互输入，请在终端中重新运行。'
@@ -509,41 +517,25 @@ show_script_intro_and_wait() {
   read -r "?👉 已了解脚本用途与影响，按回车继续；按 Ctrl+C 取消：" _
 }
 # ================================== 主流程：收口执行入口 ==================================
-# 执行入口下沉后的完整业务流程和控制逻辑。
-run_main_business_flow() {
-  # 清空旧日志，确保本次配置记录独立可查。
-  : > "${LOG_FILE}" 2>/dev/null || true
-
-  # 输出脚本用途、影响范围和环境策略。
-  print_intro
-  # 等待用户确认已经理解配置影响后继续。
-  wait_for_enter "确认：我已了解脚本用途，继续执行？"
-
-  # 自检 Homebrew，并按交互结果决定是否更新。
-  self_check_brew_optional
-  # 检查并安装 Hammerspoon 应用。
-  install_hammerspoon
-  # 备份并写入目标 Hammerspoon 配置文件。
-  prepare_hammerspoon_init
-  # 重新加载 Hammerspoon，使新配置立即生效。
-  reload_hammerspoon_config
-  # 输出系统授权提示和最终结果。
-  post_steps
-}
-# 编排脚本的高层业务流程。
-# 初始化脚本运行环境，并集中承载原有的顶层执行逻辑。
+# 初始化 Shell 选项和本次运行日志。
 initialize_script_runtime() {
   set -euo pipefail
+  setopt NO_NOMATCH
   : "${NO_COLOR:=1}"
+  : > "${LOG_FILE}"
 }
 # 编排脚本的高层业务流程。
 main() {
-  # 展示脚本内置自述，并按运行入口完成防误触确认。
-  show_script_intro_and_wait
-  # 初始化 Shell 选项、日志、依赖和入口运行状态。
-  initialize_script_runtime
-  # 执行入口下沉后的完整业务流程。
-  run_main_business_flow "$@"
+  show_script_intro_and_wait || return 1 # 打印内置自述并等待回车，取消或无交互时停止。
+  initialize_script_runtime # 确认后设置运行选项并初始化日志。
+  print_intro # 展示实际源文件、目标文件和依赖处理策略。
+  wait_for_enter "确认：我已了解脚本用途，继续执行？" # 确认具体配置影响后继续。
+  check_local_init_lua # 先校验脚本同级配置，缺失或不可读时停止安装。
+  self_check_brew_optional # 确保 Homebrew 可用，并按选择执行更新。
+  install_hammerspoon # 检查应用状态，按需安装或升级。
+  prepare_hammerspoon_init # 再次校验源文件，备份并写入配置。
+  reload_hammerspoon_config # 重新加载或启动应用，使配置生效。
+  post_steps # 输出完成结果和系统授权提示。
 }
 
 main "$@"
