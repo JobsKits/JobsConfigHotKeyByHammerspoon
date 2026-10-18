@@ -4,6 +4,8 @@
 
 [toc]
 
+[实际目录结构](#repository-layout) · [配置注入流程](#repository-script-flows)
+
 ## 一、手动安装步骤 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
 - [**Homebrew**](https://brew.sh/) ➤ [**Hammerspoon**](https://www.hammerspoon.org/)
@@ -90,5 +92,27 @@ graph TD
 - 这个快捷键只负责打开目标页面；像「仍要打开」这类安全确认按钮，仍建议手动点击，别做自动化点击。
 
 [**Homebrew**](https://brew.sh/) 安装路径由用户选择：已有可运行安装时复用；确实需要安装时先强提示，只有精确输入大写 `YES` 才选择系统标准目录，其它输入或直接回车选择当前用户的 `.local/homebrew`。`YES` 只表示选择路径，权限与密码由官方安装器实际处理；有管理员权限也可以选用户目录。选定路径失败立即停止，不自动切换；`Ctrl+C` / 输入结束取消整个任务。
+
+## 五、<span id="repository-layout">实际目录结构</span> <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
+
+```text
+🔨JobsConfigHotKeyByHammerspoon/
+├── README.md / icon.png
+├── assets/                                # 文档截图
+├── init.lua                               # 本仓实际注入的热键配置
+└── 【MacOS】💉Hammerspoon配置注入.command
+```
+
+## 六、<span id="repository-script-flows">配置注入脚本</span> <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
+
+### [【MacOS】💉Hammerspoon配置注入.command](./【MacOS】💉Hammerspoon配置注入.command)
+
+> **目的：** 安装或复用 Hammerspoon，并把同目录热键配置部署到当前用户。
+
+* 阅读说明，先检查与脚本同目录的 `init.lua`；缺失则停止。
+* 检查 Homebrew 和 Hammerspoon，按提示安装缺失项或升级已有项。
+  * 已有健康安装可直接复用；Homebrew 更新由用户选择。
+* 确认写入后再次核对源文件，为已有 `~/.hammerspoon/init.lua` 创建带时间戳的备份。
+* 复制本仓 `init.lua`，尝试启动或重载 Hammerspoon，并输出结果和日志。
 
 <a id="🔚" href="#前言" style="font-size:17px; color:green; font-weight:bold;">我是有底线的➤点我回到首页</a>
