@@ -2,11 +2,25 @@
 
 ![Jobs出品，必属精品](https://picsum.photos/1500/400)
 
-[toc]
+<!-- jobs-toc:start -->
+<!-- jobs-toc:source {"v":2,"token":"[toc]"} -->
+<details>
+<summary>📚 目录（点击展开 / 收起）</summary>
+
+- [一、手动安装步骤](#jobs-toc-heading-1)
+- [二、脚本安装（流程图）](#jobs-toc-heading-2)
+- [三、快捷键清单](#jobs-toc-heading-3)
+- [四、⌥ + Z 隐私与安全快捷键](#jobs-toc-heading-4)
+- [五、实际目录结构](#repository-layout)
+- [六、配置注入脚本](#repository-script-flows)
+  - [【MacOS】💉Hammerspoon配置注入.command](#jobs-toc-heading-7)
+
+</details>
+<!-- jobs-toc:end -->
 
 [实际目录结构](#repository-layout) · [配置注入流程](#repository-script-flows)
 
-## 一、手动安装步骤 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
+## <span id="jobs-toc-heading-1" data-jobs-toc="v2">一、手动安装步骤 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a></span><!-- jobs-toc:heading-end -->
 
 - [**Homebrew**](https://brew.sh/) ➤ [**Hammerspoon**](https://www.hammerspoon.org/)
   * 安装 [**Homebrew**](https://brew.sh/)
@@ -24,7 +38,7 @@
   
   ![image-25690117162712872](./assets/image-25690117162712872.png)
 
-## 二、脚本安装（流程图） <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
+## <span id="jobs-toc-heading-2" data-jobs-toc="v2">二、脚本安装（流程图） <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a></span><!-- jobs-toc:heading-end -->
 
 - 将 `./【MacOS】💉Hammerspoon配置注入.command` 与 `./init.lua` 放在同一目录，双击脚本或在终端执行：
 
@@ -62,7 +76,7 @@ graph TD
 
 出现“未找到脚本同级目录的 init.lua”时，对照日志中的“脚本目录”和“内容来源”：后者应为前者直接追加 `/init.lua`。确认同级文件名为 `init.lua` 且可读，再重新运行。首次安装依赖需要网络；网络安装失败时先处理对应下载错误。
 
-## 三、快捷键清单 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
+## <span id="jobs-toc-heading-3" data-jobs-toc="v2">三、快捷键清单 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a></span><!-- jobs-toc:heading-end -->
 
 | 快捷键 | 功能 |
 | --- | --- |
@@ -79,7 +93,7 @@ graph TD
 | `⌥ + Z` | 打开「系统设置」里的「隐私与安全」 |
 | `⌘ + ⌥ + ⌃ + R` | 重新加载 [**Hammerspoon**](https://www.hammerspoon.org/) 配置 |
 
-## 四、`⌥ + Z` 隐私与安全快捷键 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
+## <span id="jobs-toc-heading-4" data-jobs-toc="v2">四、`⌥ + Z` 隐私与安全快捷键 <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a></span><!-- jobs-toc:heading-end -->
 
 - `⌥ + Z` 对应 [**Hammerspoon**](https://www.hammerspoon.org/) 里的 `alt + z`，用于快速打开 [**macOS**](https://www.apple.com/macos/)「系统设置」➤「隐私与安全」。
   
@@ -105,7 +119,7 @@ graph TD
 
 ## 六、<span id="repository-script-flows">配置注入脚本</span> <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
-### [【MacOS】💉Hammerspoon配置注入.command](./【MacOS】💉Hammerspoon配置注入.command)
+### <span id="jobs-toc-heading-7" data-jobs-toc="v2">[【MacOS】💉Hammerspoon配置注入.command](./【MacOS】💉Hammerspoon配置注入.command)</span><!-- jobs-toc:heading-end -->
 
 > **目的：** 安装或复用 Hammerspoon，并把同目录热键配置部署到当前用户。
 
