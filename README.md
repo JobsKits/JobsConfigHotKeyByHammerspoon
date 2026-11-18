@@ -40,10 +40,10 @@
 
 ## <span id="jobs-toc-heading-2" data-jobs-toc="v2">二、脚本安装（流程图） <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a></span><!-- jobs-toc:heading-end -->
 
-- 将 `./【MacOS】💉Hammerspoon配置注入.command` 与 `./init.lua` 放在同一目录，双击脚本或在终端执行：
+- 将 `./【MacOS】💉Hammerspoon配置注入.command/【MacOS】💉Hammerspoon配置注入.command` 所在包装目录与 `./init.lua` 放在同一上级目录，双击脚本或在终端执行：
 
   ```shell
-  /bin/zsh './【MacOS】💉Hammerspoon配置注入.command'
+  /bin/zsh './【MacOS】💉Hammerspoon配置注入.command/【MacOS】💉Hammerspoon配置注入.command'
   ```
 
 - 脚本先显示内置自述并等待回车；确认前可按 `Ctrl+C` 取消。源配置始终按脚本自身所在目录定位，与终端当前目录、用户名和仓库克隆位置无关，不向父目录查找。
@@ -114,12 +114,12 @@ graph TD
 ├── README.md / icon.png
 ├── assets/                                # 文档截图
 ├── init.lua                               # 本仓实际注入的热键配置
-└── 【MacOS】💉Hammerspoon配置注入.command
+└── 【MacOS】💉Hammerspoon配置注入.command/
 ```
 
 ## 六、<span id="repository-script-flows">配置注入脚本</span> <a href="#前言" style="font-size:17px; color:green;"><b>🔼</b></a> <a href="#🔚" style="font-size:17px; color:green;"><b>🔽</b></a>
 
-### <span id="jobs-toc-heading-7" data-jobs-toc="v2">[【MacOS】💉Hammerspoon配置注入.command](./【MacOS】💉Hammerspoon配置注入.command)</span><!-- jobs-toc:heading-end -->
+### <span id="jobs-toc-heading-7" data-jobs-toc="v2">[【MacOS】💉Hammerspoon配置注入.command](./【MacOS】💉Hammerspoon配置注入.command/【MacOS】💉Hammerspoon配置注入.command)</span><!-- jobs-toc:heading-end -->
 
 > **目的：** 安装或复用 Hammerspoon，并把同目录热键配置部署到当前用户。
 
